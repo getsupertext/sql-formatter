@@ -640,8 +640,11 @@ class SqlFormatter
                     array_shift($indent_types);
                 }
 
-                // Add a newline after the top level reserved word
-                $newline = true;
+                // Add a newline after the top level reserved word, except if the next token is also reserved
+                if(isset($tokens[$i+1]) && $tokens[$i+1][self::TOKEN_TYPE] !== self::TOKEN_TYPE_RESERVED) {
+                    $newline = true;
+                }
+                
                 // Add a newline before the top level reserved word (if not already added)
                 if (!$added_newline) {
                     $return .= "\n" . str_repeat($tab, $indent_level);
