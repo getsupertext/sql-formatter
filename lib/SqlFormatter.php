@@ -345,8 +345,18 @@ class SqlFormatter
         // 2. square bracket quoted string (SQL Server) using ]] to escape
         // 3. double quoted string using "" or \" to escape
         // 4. single quoted string using '' or \' to escape
-        if ( preg_match('/^(((`[^`]*($|`))+)|((\[[^\]]*($|\]))(\][^\]]*($|\]))*)|(("[^"\\\\]*(?:\\\\.[^"\\\\]*)*("|$))+)|((\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*(\'|$))+))/s', $string, $matches)) {
-            $ret = $matches[1];
+		if ( preg_match(
+            '/^((?|(?:(")|(\')|(`)|(\[))
+               (?(2)([^"]|"{2}|\\\\")*(?<!\\\\)") 		# Match double quoted strings w. "" or \" escape
+               (?(3)([^\']|\'{2}|\\\\\')*(?<!\\\\)\')   # Match single quoted strings w. '' or \' escape
+               (?(4)([^`]|`{2})*`)						# Match backtick quoted strings w. `` escape
+               (?(5)([^\]]|\]{2})+\])					# Match bracket quoted strings w. ]] escape
+			   |
+				[\\.@]									# Match . or @ between quoted fragments
+			)+)/x', $string, $matches) == 1) {
+
+            $ret = $matches[0];
+
         }
         
         return $ret;
