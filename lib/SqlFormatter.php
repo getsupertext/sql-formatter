@@ -448,6 +448,34 @@ class SqlFormatter
         return $tokens;
     }
 
+
+    /**
+     * Set default formatting options to be used on all later invocations of format(...)
+     *
+     * <code>
+     *  $options =  array(
+     *     
+	 * 	  // Make reserved words uppercase 
+	 * 	  'reserved_uppercase' => false,
+	 * 	  
+	 * 	  // Suppress whitespace when equals is between reserved words, mostly to not mess up MySQL schema dumps
+	 * 	  'reserved_no_whitespace_operator' => false,
+	 * 	  
+	 * 	  // Simplify backtick quoted strings to avoid excessive ` in output
+	 * 	  'simplify_backtick_quotes' => false,
+	 * 	  
+	 * 	  // Add newline before BEGIN statement 
+	 * 	  'newline_before_begin' => false,
+     *   )
+     * <code>
+     *
+     * @param array $options Formatting options as described above, parameter values in sample is the defaults
+     */
+    public static function setFormat($options)
+    {
+        self::$format_options = array_merge(self::$format_options,$options);
+    }
+
     /**
      * Format the whitespace in a SQL string to make it easier to read.
      *
