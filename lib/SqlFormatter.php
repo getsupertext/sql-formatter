@@ -529,7 +529,7 @@ class SqlFormatter
                 array_unshift($indent_types,'block');
             }
             
-            if(self::format_options['newline_before_begin'] && isset($tokens[$i-1]) && $tokens[$i-1][self::TOKEN_VALUE] == 'BEGIN') {
+            if (self::$format_options['newline_before_begin'] && isset($tokens[$i-1]) && $tokens[$i-1][self::TOKEN_VALUE] == 'BEGIN') {
                 $return .= "\n" . str_repeat($tab, $indent_level);
             }
 
