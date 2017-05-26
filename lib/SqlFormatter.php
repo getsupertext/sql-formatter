@@ -145,6 +145,8 @@ class SqlFormatter
         // Make reserved words uppercase 
         'reserved_uppercase' => false,
 
+        // Simplify backtick quoted strings to avoid excessive ` in output
+        'simplify_backtick_quotes' => false,
     );      
 
     // This flag tells us if SqlFormatted has been initialized
@@ -163,6 +165,9 @@ class SqlFormatter
     protected static $token_cache = array();
     protected static $cache_hits = 0;
     protected static $cache_misses = 0;
+
+    // Dictionary with all reserved words as keys
+    protected static $all_reserved_words = array();
 
     /**
      * Get stats about the token cache
@@ -197,6 +202,8 @@ class SqlFormatter
         self::$regex_reserved_newline = str_replace(' ','\\s+','('.implode('|',array_map(array(__CLASS__, 'quote_regex'),self::$reserved_newline)).')');
 
         self::$regex_function = '('.implode('|',array_map(array(__CLASS__, 'quote_regex'),self::$functions)).')';
+
+        self::$all_reserved_words = array_merge(array_flip(self::$reserved),array_flip(self::$reserved_toplevel),array_flip(self::$reserved_newline));
 
         self::$init = true;
     }
@@ -476,6 +483,26 @@ class SqlFormatter
 
         // Format token by token
         foreach ($tokens as $i=>$token) {
+
+            // Remove backticks in backtick quoted strings except when the result would be a reserved word
+            if ($self::format_options['simplify_backtick_quotes']  && $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BACKTICK_QUOTE && $token[self::TOKEN_VALUE][0] === '`') {
+                if(preg_match_all('/((?:(\\G`([\\w_]+)`)(\\.)?)+)/',$token[self::TOKEN_VALUE],$matches) !== false) {
+                    if(implode('',$matches[1]) == $token[self::TOKEN_VALUE]) {
+                        $simple = array_map(function($name,$unq,$sep) {
+                            if(array_key_exists(strtoupper($unq),self::$all_reserved_words)) {
+                                return $name . $sep;
+                            } else {
+                                return $unq . $sep;
+                            } 
+                        },$matches[2],$matches[3],$matches[4]);
+                        
+                        $token[self::TOKEN_VALUE] = implode('',$simple);
+                    }   
+                }
+            }
+
+
+
             // Get highlighted token if doing syntax highlighting
             if ($highlight) {
                 $highlighted = self::highlightToken($token);
