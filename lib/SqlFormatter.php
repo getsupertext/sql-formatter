@@ -491,7 +491,7 @@ class SqlFormatter
         foreach ($tokens as $i=>$token) {
 
             // Remove backticks in backtick quoted strings except when the result would be a reserved word
-            if ($self::format_options['simplify_backtick_quotes']  && $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BACKTICK_QUOTE && $token[self::TOKEN_VALUE][0] === '`') {
+            if (self::$format_options['simplify_backtick_quotes']  && $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_BACKTICK_QUOTE && $token[self::TOKEN_VALUE][0] === '`') {
                 if(preg_match_all('/((?:(\\G`([\\w_]+)`)(\\.)?)+)/',$token[self::TOKEN_VALUE],$matches) !== false) {
                     if(implode('',$matches[1]) == $token[self::TOKEN_VALUE]) {
                         $simple = array_map(function($name,$unq,$sep) {
