@@ -766,7 +766,7 @@ class SqlFormatter
             }
          
             // Suppress spaces around equal signs between reserved words, mostly for MySQL
-            if ($self::format_options['reserved_no_whitespace_operator'] && ((isset($tokens[$i+1]) && $tokens[$i+1][self::TOKEN_VALUE] === '=' &&  $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED)
+            if (self::$format_options['reserved_no_whitespace_operator'] && ((isset($tokens[$i+1]) && $tokens[$i+1][self::TOKEN_VALUE] === '=' &&  $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED)
                     || (isset($tokens[$i-1]) && $tokens[$i-1][self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED &&  $token[self::TOKEN_VALUE] === '='))) {
                 $return = trim($return, ' ');
             }
