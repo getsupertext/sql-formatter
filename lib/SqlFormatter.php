@@ -360,12 +360,12 @@ class SqlFormatter
         // 4. single quoted string using '' or \' to escape
         if ( preg_match(
             '/^((?|(?:(")|(\')|(`)|(\[))
-               (?(2)([^"]|"{2}|\\\\")*(?<!\\\\)")       # Match double quoted strings w. "" or \" escape
-               (?(3)([^\']|\'{2}|\\\\\')*(?<!\\\\)\')   # Match single quoted strings w. '' or \' escape
-               (?(4)([^`]|`{2})*`)                      # Match backtick quoted strings w. `` escape
-               (?(5)([^\]]|\]{2})+\])                   # Match bracket quoted strings w. ]] escape
+               (?(2)([^"]|"{2}|\\\\")*(?<!\\\\)")       (?# Match double quoted strings w. "" or \\" escape)
+               (?(3)([^\']|\'{2}|\\\\\')*(?<!\\\\)\')   (?# Match single quoted strings w. \'\' or \\\' escape)
+               (?(4)([^`]|`{2})*`)                      (?# Match backtick quoted strings w. `` escape)
+               (?(5)([^\]]|\]{2})+\])                   (?# Match bracket quoted strings w. ]] escape)
                |
-                [\\.@]                                  # Match . or @ between quoted fragments
+                [\\.@]                                  (?# Match . or @ between quoted fragments)
             )+)/x', $string, $matches) == 1) {
 
             $ret = $matches[0];
