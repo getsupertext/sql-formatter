@@ -145,6 +145,9 @@ class SqlFormatter
         // Make reserved words uppercase 
         'reserved_uppercase' => false,
 
+        // Suppress whitespace when equals is between reserved words, mostly to not mess up MySQL schema dumps
+        'reserved_no_whitespace_operator' => false,
+
         // Simplify backtick quoted strings to avoid excessive ` in output
         'simplify_backtick_quotes' => false,
     );      
@@ -749,7 +752,13 @@ class SqlFormatter
             if ($token[self::TOKEN_VALUE] === '(' || $token[self::TOKEN_VALUE] === '.') {
                 $return = rtrim($return,' ');
             }
-            
+         
+            // Suppress spaces around equal signs between reserved words, mostly for MySQL
+            if ($self::format_options['reserved_no_whitespace_operator'] && ((isset($tokens[$i+1]) && $tokens[$i+1][self::TOKEN_VALUE] === '=' &&  $token[self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED)
+                    || (isset($tokens[$i-1]) && $tokens[$i-1][self::TOKEN_TYPE] === self::TOKEN_TYPE_RESERVED &&  $token[self::TOKEN_VALUE] === '='))) {
+                $return = trim($return, ' ');
+            }
+ 
             // If this is the "-" of a negative number, it shouldn't have a space after it
             if($token[self::TOKEN_VALUE] === '-' && isset($tokens[$i+1]) && $tokens[$i+1][self::TOKEN_TYPE] === self::TOKEN_TYPE_NUMBER && isset($tokens[$i-1])) {
                 $prev = $tokens[$i-1][self::TOKEN_TYPE];
