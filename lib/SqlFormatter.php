@@ -69,7 +69,7 @@ class SqlFormatter
     );
 
     protected static $reserved_newline = array(
-        'LEFT OUTER JOIN', 'RIGHT OUTER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'OUTER JOIN', 'INNER JOIN', 'JOIN', 'XOR', 'OR', 'AND', 'ON'
+        'LEFT OUTER JOIN', 'RIGHT OUTER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'OUTER JOIN', 'INNER JOIN', 'JOIN', 'XOR', 'OR', 'AND', 'ON', 'SET', 'BEGIN', 'CASE','ELSE','END'
     );
 
     protected static $functions = array (
