@@ -150,6 +150,9 @@ class SqlFormatter
 
         // Simplify backtick quoted strings to avoid excessive ` in output
         'simplify_backtick_quotes' => false,
+
+        // Add newline before BEGIN statement 
+        'newline_before_begin' => false,
     );      
 
     // This flag tells us if SqlFormatted has been initialized
@@ -524,6 +527,10 @@ class SqlFormatter
                 $indent_level++;
                 $increase_block_indent = false;
                 array_unshift($indent_types,'block');
+            }
+            
+            if(self::format_options['newline_before_begin'] && isset($tokens[$i-1]) && $tokens[$i-1][self::TOKEN_VALUE] == 'BEGIN') {
+                $return .= "\n" . str_repeat($tab, $indent_level);
             }
 
             // If we need a new line before the token
