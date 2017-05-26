@@ -583,38 +583,43 @@ class SqlFormatter
             }
 
             // Opening parentheses increase the block indent level and start a new line
-            if ($token[self::TOKEN_VALUE] === '(') {
-                // First check if this should be an inline parentheses block
-                // Examples are "NOW()", "COUNT(*)", "int(10)", key(`somecolumn`), DECIMAL(7,2)
-                // Allow up to 3 non-whitespace tokens inside inline parentheses
-                $length = 0;
-                for ($j=1;$j<=250;$j++) {
-                    // Reached end of string
-                    if (!isset($tokens[$i+$j])) break;
+            if ($token[self::TOKEN_VALUE] === '(' || strtoupper($token[self::TOKEN_VALUE]) === 'CASE') {
 
-                    $next = $tokens[$i+$j];
+                if ($token[self::TOKEN_VALUE] === '(') {
+                    // First check if this should be an inline parentheses block
+                    // Examples are "NOW()", "COUNT(*)", "int(10)", key(`somecolumn`), DECIMAL(7,2)
+                    // Allow up to 3 non-whitespace tokens inside inline parentheses
+                    $length = 0;
+                    for ($j=1;$j<=250;$j++) {
+                        // Reached end of string
+                        if (!isset($tokens[$i+$j])) break;
 
-                    // Reached closing parentheses, able to inline it
-                    if ($next[self::TOKEN_VALUE] === ')') {
-                        $inline_parentheses = true;
-                        $inline_count = 0;
-                        $inline_indented = false;
-                        break;
+                        $next = $tokens[$i+$j];
+
+                        // Reached closing parentheses, able to inline it
+                        if ($next[self::TOKEN_VALUE] === ')') {
+                            $inline_parentheses = true;
+                            $inline_count = 0;
+                            $inline_indented = false;
+                            break;
+                        }
+
+                        // Reached an invalid token for inline parentheses
+                        if ($next[self::TOKEN_VALUE]===';' || $next[self::TOKEN_VALUE]==='(') {
+                            break;
+                        }
+
+                        // Reached an invalid token type for inline parentheses
+                        if ($next[self::TOKEN_TYPE]===self::TOKEN_TYPE_RESERVED_TOPLEVEL || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_RESERVED_NEWLINE || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_COMMENT || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_BLOCK_COMMENT) {
+                            break;
+                        }
+
+                        $length += strlen($next[self::TOKEN_VALUE]);
                     }
-
-                    // Reached an invalid token for inline parentheses
-                    if ($next[self::TOKEN_VALUE]===';' || $next[self::TOKEN_VALUE]==='(') {
-                        break;
-                    }
-
-                    // Reached an invalid token type for inline parentheses
-                    if ($next[self::TOKEN_TYPE]===self::TOKEN_TYPE_RESERVED_TOPLEVEL || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_RESERVED_NEWLINE || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_COMMENT || $next[self::TOKEN_TYPE]===self::TOKEN_TYPE_BLOCK_COMMENT) {
-                        break;
-                    }
-
-                    $length += strlen($next[self::TOKEN_VALUE]);
+                } else {
+                    $inline_parantheses = false;
                 }
-
+                
                 if ($inline_parentheses && $length > 30) {
                     $increase_block_indent = true;
                     $inline_indented = true;
@@ -635,7 +640,7 @@ class SqlFormatter
             }
 
             // Closing parentheses decrease the block indent level
-            elseif ($token[self::TOKEN_VALUE] === ')') {
+            elseif ($token[self::TOKEN_VALUE] === ')' || strtoupper($token[self::TOKEN_VALUE]) === 'END') {
                 // Remove whitespace before the closing parentheses
                 $return = rtrim($return,' ');
 
