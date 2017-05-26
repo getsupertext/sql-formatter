@@ -304,7 +304,7 @@ class SqlFormatter
 
        // A reserved word cannot be preceded by a '.' or an '@'
         // this makes it so in "mytable.from", "from" is not considered a reserved word
-        if (!$previo|us || !isset($previous[self::TOKEN_VALUE]) || $previous[self::TOKEN_VALUE] !== '.' || $previous[self::TOKEN_VALUE] !== '@') {
+        if (!$previous || !isset($previous[self::TOKEN_VALUE]) || $previous[self::TOKEN_VALUE] !== '.' || $previous[self::TOKEN_VALUE] !== '@') {
             $upper = strtoupper($string);
             // Top Level Reserved Word
             if (preg_match('/^('.self::$regex_reserved_toplevel.')($|\s|'.self::$regex_boundaries.')/', $upper,$matches)) {
