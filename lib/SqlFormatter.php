@@ -747,7 +747,7 @@ class SqlFormatter
             }
 
             // Uppercase reserved words
-            if(self::format_options['reserved_uppercase'] && in_array($token[self::TOKEN_TYPE],array(self::TOKEN_TYPE_RESERVED,self::TOKEN_TYPE_RESERVED_NEWLINE,self::TOKEN_TYPE_RESERVED_TOPLEVEL))){
+            if (self::$format_options['reserved_uppercase'] && in_array($token[self::TOKEN_TYPE],array(self::TOKEN_TYPE_RESERVED,self::TOKEN_TYPE_RESERVED_NEWLINE,self::TOKEN_TYPE_RESERVED_TOPLEVEL))){
                 $highlighted = strtoupper($highlighted);
             }
 
