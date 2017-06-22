@@ -239,9 +239,28 @@ class SqlFormatter
             if ($string[0] === '-' || $string[0] === '#') {
                 $last = strpos($string, "\n");
                 $type = self::TOKEN_TYPE_COMMENT;
-            } else { // Comment until closing comment tag
-                $last = strpos($string, "*/", 2) + 2;
-                $type = self::TOKEN_TYPE_BLOCK_COMMENT;
+			} else { // Comment until closing comment tag
+				if ( isset($string[2]) && $string[2] === '!' ) {
+					$search_from=2;
+					$nestings=0;
+					do {
+						$last = strpos($string, "*/", $search_from);
+						$nested = strpos($string,"/*",$search_from);
+						if ($nestings > 0 && $last !== false) {
+							$nestings--;
+						}
+						if ($nested !== false) {
+							$search_from = $nested;
+							$nestings++;
+							$last+=2;
+							$nested+=2;
+						}
+					} while ($nested !== false && $nested < $last || $nestings > 0);
+                	$type = self::TOKEN_TYPE_CONDITIONAL_BLOCK_COMMENT;
+				} else {
+                	$last = strpos($string, "*/", 2) + 2;
+                	$type = self::TOKEN_TYPE_BLOCK_COMMENT;
+				}
             }
 
             if ($last === false) {
